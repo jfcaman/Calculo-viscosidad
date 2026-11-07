@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculador de viscosidad de mezclas de aceites</title>
+    <style>
+        :root {
+            /* Dark mode color palette */
+            --primary-green: #2dc653;
+            --primary-green-dark: #208f3a;
+            --light-grey: #121212; /* page background */
+            --container-bg: #1e1e1e; /* container background */
+            --text-color: #f0f0f0;
+            --label-color: #cccccc;
+            --border-color: #333333;
+            --footer-color: #aaaaaa;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--light-grey);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+        .container {
+            background-color: var(--container-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 24px 28px;
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+            margin-top: 40px;
+        }
+        h1 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--primary-green);
+            text-transform: uppercase;
+        }
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+            color: var(--label-color);
+        }
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+            /* Dark mode input backgrounds and text */
+            background-color: var(--container-bg);
+            color: var(--text-color);
+        }
+        /* Placeholder text color in dark mode */
+        input[type="number"]::placeholder,
+        input[type="text"]::placeholder {
+            color: #888;
+        }
+
+        /* Estilos para los campos LOTE en una misma fila */
+        .lote-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        .lote-item {
+            flex: 1;
+        }
+        .lote-item label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+            color: var(--label-color);
+        }
+        .lote-item input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+            margin-bottom: 0;
+            /* Dark mode input backgrounds and text */
+            background-color: var(--container-bg);
+            color: var(--text-color);
+        }
+        .section {
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--light-grey);
+        }
+        .section h2 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 16px;
+            color: var(--primary-green);
+            text-align: left;
+        }
+        .result {
+            margin-top: 12px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            /* Dark mode result background and text */
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            display: none;
+        }
+        .result p {
+            margin: 4px 0;
+            font-size: 14px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        button {
+            background-color: var(--primary-green);
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            flex: 1;
+        }
+        button:hover {
+            background-color: var(--primary-green-dark);
+        }
+        /* Links in dark mode */
+        a {
+            color: var(--primary-green);
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--footer-color);
+        }
+        /* Print styles to fit on one page */
+        @media print {
+            @page {
+                size: A4;
+                margin: 20mm;
+            }
+            body {
+                background-color: #fff;
+                margin: 0;
+                padding: 0;
+                zoom: 79%;
+            }
+            .container {
+                box-shadow: none;
+                margin: 0;
+                max-width: 100%;
+            }
+            button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculador de mezclas de viscosidades</h1>
+        <label for="cliente">CLIENTE:</label>
+        <input type="text" id="cliente" placeholder="Nombre del cliente" />
+        <div class="lote-row">
+            <div class="lote-item">
+                <label for="lote1">LOTE 1:</label>
+                <input type="text" id="lote1" placeholder="Número de lote 1" />
+            </div>
+            <div class="lote-item">
+                <label for="lote2">LOTE 2:</label>
+                <input type="text" id="lote2" placeholder="Número de lote 2" />
+            </div>
+        </div>
+        <!-- Section 1: Viscosity of mixture -->
+        <div class="section" id="mix-section">
+            <h2>Cálculo de la viscosidad de dos aceites conocidos</h2>
+            <label for="v1">Viscosidad del Aceite 1 (cSt)</label>
+            <input type="number" id="v1" min="0" step="0.01" placeholder="cSt">
+            <label for="v2">Viscosidad del Aceite 2 (cSt)</label>
+            <input type="number" id="v2" min="0" step="0.01" placeholder="cSt">
+            <label for="pct1">Porcentaje del Aceite 1 (%)</label>
+            <input type="number" id="pct1" min="0" max="100" step="0.01" placeholder="%">
+            <label for="temp1">Temperatura (°C)</label>
+            <input type="number" id="temp1" step="0.1" placeholder="°C">
+            <div class="btn-group">
+                <button onclick="calcularMezcla()">Calcular</button>
+                <button onclick="borrarMezcla()">Borrar</button>
+            </div>
+            <div class="result" id="resultado-mezcla"></div>
+        </div>
+        <!-- Section 2: Percentage to achieve desired viscosity -->
+        <div class="section" id="ratio-section">
+            <h2>Cálculo del porcentaje de mezcla para obtener una viscosidad deseada</h2>
+            <label for="v1b">Viscosidad del Aceite 1 (cSt)</label>
+            <input type="number" id="v1b" min="0" step="0.01" placeholder="cSt">
+            <label for="v2b">Viscosidad del Aceite 2 (cSt)</label>
+            <input type="number" id="v2b" min="0" step="0.01" placeholder="cSt">
+            <label for="vtarget">Viscosidad deseada (cSt)</label>
+            <input type="number" id="vtarget" min="0" step="0.01" placeholder="cSt">
+            <label for="temp2">Temperatura (°C)</label>
+            <input type="number" id="temp2" step="0.1" placeholder="°C">
+            <div class="btn-group">
+                <button onclick="calcularPorcentaje()">Calcular</button>
+                <button onclick="borrarPorcentaje()">Borrar</button>
+            </div>
+            <div class="result" id="resultado-porcentaje"></div>
+        </div>
+        <!-- Botón para exportar a PDF -->
+        <div style="text-align:center; margin: 20px 0;">
+            <button onclick="exportarPDF()" style="width:auto; padding:10px 20px;">Exportar a PDF</button>
+        </div>
+        <!-- Footer / Contact -->
+        <div class="footer">
+            <img src="TRICOMBUS.png" alt="TRICOMBUS logo" style="max-width:200px; width:50%; height:auto; display:block; margin:0 auto 10px auto;">
+            <strong>Autor:</strong> Ing. Jose Carrillo<br>
+            <strong>Email:</strong> <a href="mailto:josecarrillo@tricombus.com.gt">josecarrillo@tricombus.com.gt</a><br>
+            TRICOMBUS GUATEMALA<br>
+            +502 2221-5523
+        </div>
+    </div>
+    <script>
+        // Utility functions for viscosity blending (Refutas method)
+        function vbn(visc) {
+            return 14.534 * Math.log(Math.log(visc + 0.8)) + 10.975;
+        }
+        function viscFromVbn(vbnValue) {
+            return Math.exp(Math.exp((vbnValue - 10.975) / 14.534)) - 0.8;
+        }
+        // Section 1: calculate mixture viscosity
+        function calcularMezcla() {
+            const v1 = parseFloat(document.getElementById('v1').value);
+            const v2 = parseFloat(document.getElementById('v2').value);
+            const pct1 = parseFloat(document.getElementById('pct1').value);
+            const resDiv = document.getElementById('resultado-mezcla');
+            if (isNaN(v1) || isNaN(v2) || isNaN(pct1)) {
+                resDiv.style.display = 'block';
+                resDiv.innerHTML = '<p style="color:red;">Por favor, introduce valores válidos para viscosidades y porcentaje.</p>';
+                return;
+            }
+            const frac1 = pct1 / 100;
+            const frac2 = 1 - frac1;
+            const vbn1 = vbn(v1);
+            const vbn2 = vbn(v2);
+            const vbnMix = frac1 * vbn1 + frac2 * vbn2;
+            const vMix = viscFromVbn(vbnMix);
+            resDiv.style.display = 'block';
+            resDiv.innerHTML = `<p><strong>Viscosidad de la mezcla:</strong> ${vMix.toFixed(2)} cSt</p>`;
+        }
+        function borrarMezcla() {
+            document.getElementById('v1').value = '';
+            document.getElementById('v2').value = '';
+            document.getElementById('pct1').value = '';
+            document.getElementById('temp1').value = '';
+            const resDiv = document.getElementById('resultado-mezcla');
+            resDiv.style.display = 'none';
+            resDiv.innerHTML = '';
+        }
+        // Section 2: calculate required percentage for desired viscosity
+        function calcularPorcentaje() {
+            const v1 = parseFloat(document.getElementById('v1b').value);
+            const v2 = parseFloat(document.getElementById('v2b').value);
+            const vtarget = parseFloat(document.getElementById('vtarget').value);
+            const resDiv = document.getElementById('resultado-porcentaje');
+            if (isNaN(v1) || isNaN(v2) || isNaN(vtarget)) {
+                resDiv.style.display = 'block';
+                resDiv.innerHTML = '<p style="color:red;">Por favor, introduce valores válidos para viscosidades.</p>';
+                return;
+            }
+            // Ensure vtarget between v1 and v2
+            if (!((vtarget > v1 && vtarget < v2) || (vtarget > v2 && vtarget < v1))) {
+                resDiv.style.display = 'block';
+                resDiv.innerHTML = '<p style="color:red;">La viscosidad deseada debe estar entre las viscosidades de los dos aceites.</p>';
+                return;
+            }
+            const vbn1 = vbn(v1);
+            const vbn2 = vbn(v2);
+            const vbnTarget = vbn(vtarget);
+            const frac1 = (vbnTarget - vbn2) / (vbn1 - vbn2);
+            const frac2 = 1 - frac1;
+            if (frac1 < 0 || frac1 > 1) {
+                resDiv.style.display = 'block';
+                resDiv.innerHTML = '<p style="color:red;">La combinación deseada no es posible con estas viscosidades.</p>';
+                return;
+            }
+            resDiv.style.display = 'block';
+            resDiv.innerHTML = `<p><strong>Porcentaje del Aceite 1:</strong> ${(frac1 * 100).toFixed(2)} %</p>` +
+                               `<p><strong>Porcentaje del Aceite 2:</strong> ${(frac2 * 100).toFixed(2)} %</p>`;
+        }
+        function borrarPorcentaje() {
+            document.getElementById('v1b').value = '';
+            document.getElementById('v2b').value = '';
+            document.getElementById('vtarget').value = '';
+            document.getElementById('temp2').value = '';
+            const resDiv = document.getElementById('resultado-porcentaje');
+            resDiv.style.display = 'none';
+            resDiv.innerHTML = '';
+        }
+
+        // Función para exportar a PDF. Abre el diálogo de impresión con el contenido ajustado al 85%.
+        function exportarPDF() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
